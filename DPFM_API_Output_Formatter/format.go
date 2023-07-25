@@ -17,6 +17,9 @@ func ConvertToPaymentMethod(rows *sql.Rows) (*[]PaymentMethod, error) {
 
 		err := rows.Scan(
 			&pm.PaymentMethod,
+			&pm.CreationDate,
+			&pm.LastChangeDate,
+			&pm.IsMarkedForDeletion,
 		)
 		if err != nil {
 			fmt.Printf("err = %+v \n", err)
@@ -25,7 +28,10 @@ func ConvertToPaymentMethod(rows *sql.Rows) (*[]PaymentMethod, error) {
 
 		data := pm
 		paymentMethod = append(paymentMethod, PaymentMethod{
-			PaymentMethod: data.PaymentMethod,
+			PaymentMethod:			data.PaymentMethod,
+			CreationDate:			data.CreationDate,
+			LastChangeDate:			data.LastChangeDate,
+			IsMarkedForDeletion:	data.IsMarkedForDeletion,
 		})
 	}
 
@@ -45,6 +51,9 @@ func ConvertToPaymentMethodText(rows *sql.Rows) (*[]PaymentMethodText, error) {
 			&pm.PaymentMethod,
 			&pm.Language,
 			&pm.PaymentMethodName,
+			&pm.CreationDate,
+			&pm.LastChangeDate,
+			&pm.IsMarkedForDeletion,
 		)
 		if err != nil {
 			fmt.Printf("err = %+v \n", err)
@@ -53,44 +62,13 @@ func ConvertToPaymentMethodText(rows *sql.Rows) (*[]PaymentMethodText, error) {
 
 		data := pm
 		paymentMethodText = append(paymentMethodText, PaymentMethodText{
-			PaymentMethod:     data.PaymentMethod,
-			Language:          data.Language,
-			PaymentMethodName: data.PaymentMethodName,
+			PaymentMethod:     		data.PaymentMethod,
+			Language:          		data.Language,
+			PaymentMethodName:		data.PaymentMethodName,
+			CreationDate:			data.CreationDate,
+			LastChangeDate:			data.LastChangeDate,
+			IsMarkedForDeletion:	data.IsMarkedForDeletion,
 		})
-	}
-
-	return &paymentMethodText, nil
-}
-
-func ConvertToPaymentMethodTexts(rows *sql.Rows) (*[]PaymentMethodText, error) {
-	defer rows.Close()
-	paymentMethodText := make([]PaymentMethodText, 0)
-
-	i := 0
-	for rows.Next() {
-		i++
-		pm := &requests.PaymentMethodTexts{}
-
-		err := rows.Scan(
-			&pm.PaymentMethod,
-			&pm.Language,
-			&pm.PaymentMethodName,
-		)
-		if err != nil {
-			fmt.Printf("err = %+v \n", err)
-			return &paymentMethodText, err
-		}
-
-		data := pm
-		paymentMethodText = append(paymentMethodText, PaymentMethodText{
-			PaymentMethod:     data.PaymentMethod,
-			Language:          data.Language,
-			PaymentMethodName: data.PaymentMethodName,
-		})
-	}
-	if i == 0 {
-		fmt.Printf("DBに対象のレコードが存在しません。")
-		return &paymentMethodText, nil
 	}
 
 	return &paymentMethodText, nil

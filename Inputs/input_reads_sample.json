@@ -5,20 +5,26 @@
 	"filepath": "/var/lib/aion/Data/rededge_sdc/abcdef.json",
 	"api_status_code": 200,
 	"runtime_session_id": "boi9ar543dg91ipdnspi099u231280ab0v8af0ew",
-	"business_partner": 101,
+	"business_partner": null,
 	"service_label": "PAYMENT_METHOD",
 	"api_type": "reads",
 	"PaymentMethod": {
-		"PaymentMethod": "F",
-		"PaymentMethodText" :[
+		"PaymentMethod": "",
+		"CreationDate": "",
+		"LastChangeDate": "",
+		"IsMarkedForDeletion": null,
+		"PaymentMethodText": [
 			{
-			"Language":"JA",
-			"PaymentMethodName":""
+				"Language": "",
+				"PaymentMethodName": "",
+				"CreationDate": "",
+				"LastChangeDate": "",
+				"IsMarkedForDeletion": null
 			}
 		]
 	},
 	"api_schema": "DPFMPaymentMethodReads",
-	"accepter": ["All"],
-	"payment_method": "",
-	"deleted": false
+	"accepter": [
+		"PaymentMethod"
+	]
 }

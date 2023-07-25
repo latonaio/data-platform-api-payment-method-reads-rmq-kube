@@ -70,12 +70,18 @@ type SDC struct {
 }
 
 type PaymentMethod struct {
-	PaymentMethod     string              `json:"PaymentMethod"`
-	PaymentMethodText []PaymentMethodText `json:"PaymentMethodText"`
+	PaymentMethod		string	`json:"PaymentMethod"`
+	CreationDate		*string	`json:"CreationDate"`
+	LastChangeDate		*string	`json:"LastChangeDate"`
+	IsMarkedForDeletion	*bool	`json:"IsMarkedForDeletion"`
+	PaymentMethodText	[]PaymentMethodText `json:"PaymentMethodText"`
 }
 
 type PaymentMethodText struct {
-	PaymentMethod     string  `json:"PaymentMethod"`
-	Language          string  `json:"Language"`
-	PaymentMethodName *string `json:"PaymentMethodName"`
+	PaymentMethod     	string   `json:"PaymentMethod"`
+	Language          	string   `json:"Language"`
+	PaymentMethodName	*string  `json:"PaymentMethodName"`
+	CreationDate		*string  `json:"CreationDate"`
+	LastChangeDate		*string	 `json:"LastChangeDate"`
+	IsMarkedForDeletion	*bool	 `json:"IsMarkedForDeletion"`
 }

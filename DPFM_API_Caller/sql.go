@@ -27,6 +27,10 @@ func (c *DPFMAPICaller) readSqlProcess(
 			func() {
 				paymentMethod = c.PaymentMethod(mtx, input, output, errs, log)
 			}()
+		case "PaymentMethods":
+			func() {
+				paymentMethod = c.PaymentMethods(mtx, input, output, errs, log)
+			}()
 		case "PaymentMethodText":
 			func() {
 				paymentMethodText = c.PaymentMethodText(mtx, input, output, errs, log)
@@ -54,12 +58,48 @@ func (c *DPFMAPICaller) PaymentMethod(
 	errs *[]error,
 	log *logger.Logger,
 ) *[]dpfm_api_output_formatter.PaymentMethod {
-	paymentMethod := input.PaymentMethod.PaymentMethod
+	where := fmt.Sprintf("WHERE PaymentMethod = '%s'", input.PaymentMethod.PaymentMethod)
+
+	if input.PaymentMethod.IsMarkedForDeletion != nil {
+		where = fmt.Sprintf("%s\nAND IsMarkedForDeletion = %v", where, *input.PaymentMethod.IsMarkedForDeletion)
+	}
 
 	rows, err := c.db.Query(
 		`SELECT *
 		FROM DataPlatformMastersAndTransactionsMysqlKube.data_platform_payment_method_payment_method_data
-		WHERE PaymentMethod = ?;`, paymentMethod,
+		` + where + ` ORDER BY IsMarkedForDeletion ASC, PaymentMethod DESC;`,
+	)
+	if err != nil {
+		*errs = append(*errs, err)
+		return nil
+	}
+	defer rows.Close()
+
+	data, err := dpfm_api_output_formatter.ConvertToPaymentMethod(rows)
+	if err != nil {
+		*errs = append(*errs, err)
+		return nil
+	}
+
+	return data
+}
+
+func (c *DPFMAPICaller) PaymentMethods(
+	mtx *sync.Mutex,
+	input *dpfm_api_input_reader.SDC,
+	output *dpfm_api_output_formatter.SDC,
+	errs *[]error,
+	log *logger.Logger,
+) *[]dpfm_api_output_formatter.PaymentMethod {
+
+	if input.PaymentMethod.IsMarkedForDeletion != nil {
+		where = fmt.Sprintf("%s\nAND IsMarkedForDeletion = %v", where, *input.PaymentMethod.IsMarkedForDeletion)
+	}
+
+	rows, err := c.db.Query(
+		`SELECT *
+		FROM DataPlatformMastersAndTransactionsMysqlKube.data_platform_payment_method_payment_method_data
+		` + where + ` ORDER BY IsMarkedForDeletion ASC, PaymentMethod DESC;`,
 	)
 	if err != nil {
 		*errs = append(*errs, err)
@@ -95,7 +135,7 @@ func (c *DPFMAPICaller) PaymentMethodText(
 
 	repeat := strings.Repeat("(?,?),", cnt-1) + "(?,?)"
 	rows, err := c.db.Query(
-		`SELECT * 
+		`SELECT *
 		FROM DataPlatformMastersAndTransactionsMysqlKube.data_platform_payment_method_payment_method_text_data
 		WHERE (PaymentMethod, Language) IN ( `+repeat+` );`, args...,
 	)
@@ -143,7 +183,7 @@ func (c *DPFMAPICaller) PaymentMethodTexts(
 	defer rows.Close()
 
 	//
-	data, err := dpfm_api_output_formatter.ConvertToPaymentMethodTexts(rows)
+	data, err := dpfm_api_output_formatter.ConvertToPaymentMethodText(rows)
 	if err != nil {
 		*errs = append(*errs, err)
 		return nil
